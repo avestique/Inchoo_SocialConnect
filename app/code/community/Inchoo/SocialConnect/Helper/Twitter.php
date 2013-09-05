@@ -192,20 +192,25 @@ class Inchoo_SocialConnect_Helper_Twitter extends Mage_Core_Helper_Abstract
                 return null;
         }
 
-        if(!file_exists($filename) || 
-                (file_exists($filename) && (time() - filemtime($filename) >= 3600))){
-            $client = new Zend_Http_Client($pictureUrl);
-            $client->setStream();
-            $response = $client->request('GET');
-            stream_copy_to_stream($response->getStream(), fopen($filename, 'w'));
+        try
+        {
+            if(!file_exists($filename) ||
+                    (file_exists($filename) && (time() - filemtime($filename) >= 3600))){
+                $client = new Zend_Http_Client($pictureUrl);
+                $client->setStream();
+                $response = $client->request('GET');
+                stream_copy_to_stream($response->getStream(), fopen($filename, 'w'));
 
-            $imageObj = new Varien_Image($filename);
-            $imageObj->constrainOnly(true);
-            $imageObj->keepAspectRatio(true);
-            $imageObj->keepFrame(false);
-            $imageObj->resize(150, 150);
-            $imageObj->save($filename);
+                $imageObj = new Varien_Image($filename);
+                $imageObj->constrainOnly(true);
+                $imageObj->keepAspectRatio(true);
+                $imageObj->keepFrame(false);
+                $imageObj->resize(150, 150);
+                $imageObj->save($filename);
+            }
         }
+        catch (Exception $e)
+        {}
         
         return $url;
     }

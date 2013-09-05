@@ -36,6 +36,7 @@ class Inchoo_SocialConnect_Block_Login extends Mage_Core_Block_Template
     protected $clientGoogle = null;
     protected $clientFacebook = null;
     protected $clientTwitter = null;
+    protected $clientVk = null;
 
     protected $numEnabled = 0;
     protected $numDescShown = 0;
@@ -47,9 +48,11 @@ class Inchoo_SocialConnect_Block_Login extends Mage_Core_Block_Template
         $this->clientGoogle = Mage::getSingleton('inchoo_socialconnect/google_client');
         $this->clientFacebook = Mage::getSingleton('inchoo_socialconnect/facebook_client');
         $this->clientTwitter = Mage::getSingleton('inchoo_socialconnect/twitter_client');
+        $this->clientVk = Mage::getSingleton('inchoo_socialconnect/vk_client');
 
         if( !$this->_googleEnabled() &&
             !$this->_facebookEnabled() &&
+            !$this->_vkEnabled() &&
             !$this->_twitterEnabled())
             return;
 
@@ -62,6 +65,10 @@ class Inchoo_SocialConnect_Block_Login extends Mage_Core_Block_Template
         }
 
         if($this->_twitterEnabled()) {
+            $this->numEnabled++;
+        }
+
+        if($this->_vkEnabled()) {
             $this->numEnabled++;
         }
 
@@ -98,6 +105,11 @@ class Inchoo_SocialConnect_Block_Login extends Mage_Core_Block_Template
     protected function _twitterEnabled()
     {
         return $this->clientTwitter->isEnabled();
+    }
+
+    protected function _vkEnabled()
+    {
+        return $this->clientVk->isEnabled();
     }
 
 }

@@ -47,10 +47,13 @@
             </inchoo_socialconnect_google>
             <inchoo_socialconnect_facebook>
                 <enabled>0</enabled>
-            </inchoo_socialconnect_facebook>	    
+            </inchoo_socialconnect_facebook>
             <inchoo_socialconnect_twitter>
                 <enabled>0</enabled>
-            </inchoo_socialconnect_twitter>	    	    
+            </inchoo_socialconnect_twitter>
+            <inchoo_socialconnect_vk>
+                <enabled>0</enabled>
+            </inchoo_socialconnect_vk>
         </customer>
     </default>
     <frontend>

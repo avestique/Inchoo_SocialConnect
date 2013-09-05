@@ -36,6 +36,7 @@ class Inchoo_SocialConnect_Block_Checkout extends Mage_Core_Block_Template
     protected $clientGoogle = null;
     protected $clientFacebook = null;
     protected $clientTwitter = null;
+    protected $clientVk = null;
     
     protected $numEnabled = 0;
     protected $numShown = 0;    
@@ -43,17 +44,15 @@ class Inchoo_SocialConnect_Block_Checkout extends Mage_Core_Block_Template
     protected function _construct() {
         parent::_construct();
 
-        $this->clientGoogle = Mage::getSingleton('inchoo_socialconnect/google_client');
+        $this->clientGoogle   = Mage::getSingleton('inchoo_socialconnect/google_client');
         $this->clientFacebook = Mage::getSingleton('inchoo_socialconnect/facebook_client');
-        $this->clientTwitter = Mage::getSingleton('inchoo_socialconnect/twitter_client');
-
-        $this->clientGoogle = Mage::getSingleton('inchoo_socialconnect/google_client');
-        $this->clientFacebook = Mage::getSingleton('inchoo_socialconnect/facebook_client');
-        $this->clientTwitter = Mage::getSingleton('inchoo_socialconnect/twitter_client');
+        $this->clientTwitter  = Mage::getSingleton('inchoo_socialconnect/twitter_client');
+        $this->clientVk       = Mage::getSingleton('inchoo_socialconnect/vk_client');
 
         if( !$this->_googleEnabled() &&
             !$this->_facebookEnabled() &&
-            !$this->_twitterEnabled())
+            !$this->_twitterEnabled() &&
+            !$this->_vkEnabled() )
             return;
 
         if($this->_googleEnabled()) {
@@ -67,7 +66,11 @@ class Inchoo_SocialConnect_Block_Checkout extends Mage_Core_Block_Template
         if($this->_twitterEnabled()) {
             $this->numEnabled++;
         }
-        
+
+        if($this->_vkEnabled()) {
+            $this->numEnabled++;
+        }
+
         Mage::register('inchoo_socialconnect_button_text', $this->__('Continue'));
 
         $this->setTemplate('inchoo/socialconnect/checkout.phtml');
@@ -96,6 +99,11 @@ class Inchoo_SocialConnect_Block_Checkout extends Mage_Core_Block_Template
     protected function _twitterEnabled()
     {
         return $this->clientTwitter->isEnabled();
+    }
+
+    protected function _vkEnabled()
+    {
+        return $this->clientVk->isEnabled();
     }
 
 }
