@@ -61,49 +61,52 @@ class Inchoo_SocialConnect_Helper_Vk extends Mage_Core_Helper_Abstract
             @unlink($pictureFilename);
         }
 
-        $collection = Mage::getModel('customer/customer')->getCollection()
-            ->addAttributeToSelect('*')
-            ->addAttributeToFilter('inchoo_socialconnect_vemail', 1)
-            ->addAttributeToFilter('entity_id', $customer->getId())
-            ->setPageSize(1);
+        $customer->setInchooSocialconnectVid(null)
+                 ->setInchooSocialconnectVtoken(null)
+                 ->save();
 
-        if ($collection->count())
+        if ($client->canDeleteAccount())
         {
-            $customerTemp = $collection->getFirstItem();
+            $collection = Mage::getModel('customer/customer')->getCollection()
+                ->addAttributeToSelect('*')
+                ->addAttributeToFilter('inchoo_socialconnect_vemail', 1)
+                ->addAttributeToFilter('entity_id', $customer->getId())
+                ->setPageSize(1);
 
-            $attributes = $customerTemp->getAttributes();
-
-            $hasAnotherSessions = false;
-
-            foreach($attributes as $attribute)
+            if ($collection->count())
             {
-                if (in_array($attribute->getAttributeCode(), array(
-                    self::SOCIAL_CONNECT_FACEBOOK_ID,
-                    self::SOCIAL_CONNECT_GOOGLE_ID,
-                    self::SOCIAL_CONNECT_TWITTER_ID
-                )) && $customerTemp->getData($attribute->getAttributeCode()))
+                $customerTemp = $collection->getFirstItem();
+
+                $attributes = $customerTemp->getAttributes();
+
+                $hasAnotherSessions = false;
+
+                foreach($attributes as $attribute)
                 {
-                    $hasAnotherSessions = true;
-                    break;
+                    if (in_array($attribute->getAttributeCode(), array(
+                        self::SOCIAL_CONNECT_FACEBOOK_ID,
+                        self::SOCIAL_CONNECT_GOOGLE_ID,
+                        self::SOCIAL_CONNECT_TWITTER_ID
+                    )) && $customerTemp->getData($attribute->getAttributeCode()))
+                    {
+                        $hasAnotherSessions = true;
+                        break;
+                    }
+                }
+
+                if (!$hasAnotherSessions)
+                {
+                    Mage::register('isSecureArea', true, true);
+                    Mage::getModel('customer/customer')->load($customer->getId())->delete();
+                    Mage::unregister('isSecureArea');
+
+                    Mage::getSingleton('customer/session')->logout()->setBeforeAuthUrl(Mage::getUrl());
+
+                    //Mage::app()->getResponse()->setRedirect();
+                    return Mage::getUrl('customer/account/');
                 }
             }
-
-            if (!$hasAnotherSessions)
-            {
-                Mage::register('isSecureArea', true, true);
-                Mage::getModel('customer/customer')->load($customer->getId())->delete();
-                Mage::unregister('isSecureArea');
-
-                Mage::getSingleton('customer/session')->logout()->setBeforeAuthUrl(Mage::getUrl());
-
-                //Mage::app()->getResponse()->setRedirect();
-                return Mage::getUrl('customer/account/');
-            }
         }
-
-        $customer->setInchooSocialconnectVid(null)
-                ->setInchooSocialconnectVtoken(null)
-                ->save();
 
         return NULL;
     }

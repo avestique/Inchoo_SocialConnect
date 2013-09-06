@@ -49,9 +49,9 @@ class Inchoo_SocialConnect_Block_VK_Account extends Mage_Core_Block_Template
         $this->setTemplate('inchoo/socialconnect/vk/account.phtml');
     }
 
-    protected function _enableAutoEmail()
+    protected function _enableEmailService()
     {
-        return $this->client->enableAutoEmail();
+        return $this->client->enableEmailService();
     }
 
     protected function _hasUserInfo()

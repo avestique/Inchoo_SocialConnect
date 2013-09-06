@@ -50,6 +50,11 @@ class Inchoo_SocialConnect_Block_Twitter_Account extends Mage_Core_Block_Templat
 
     }
 
+    protected function _enableEmailService()
+    {
+        return $this->client->enableEmailService();
+    }
+
     protected function _hasUserInfo()
     {
         return (bool) $this->userInfo;

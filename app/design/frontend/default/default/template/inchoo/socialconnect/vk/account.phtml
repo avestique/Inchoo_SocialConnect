@@ -46,6 +46,7 @@
         $picture = $this->_getPicture();
         $gender = $this->_getGender();
         $birthday = $this->_getBirthday();
+        $enableEmailService = $this->_enableEmailService();
     ?>
 
     <div class="col3-set">
@@ -65,10 +66,10 @@
                     </p>
                     <?php endif; ?>
                     <?php if(!empty($email)): ?>
-                        <?php if ( $this->_enableAutoEmail() ): ?>
-                            <p>
-                                <?php printf($this->__('Email: %s', '<strong>'.$email.'</strong>')) ?>
-                            </p>
+                        <p>
+                            <?php printf($this->__('Email: %s', '<strong>'.$email.'</strong>')) ?>
+                        </p>
+                        <?php if ( $enableEmailService ): ?>
                             <p>
                                 <?php echo $this->__("An email above was generated for you but this email aprovides NO privacy. All emails can be read by anyone. <div><b>Update your email address and password using our <a href='%s'>Edit Account Information</a></b></div>.", $this->getUrl('customer/account/edit/')) ?>
                             </p>

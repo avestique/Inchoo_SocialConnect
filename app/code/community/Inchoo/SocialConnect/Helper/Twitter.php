@@ -33,8 +33,14 @@
 
 class Inchoo_SocialConnect_Helper_Twitter extends Mage_Core_Helper_Abstract
 {
+    CONST SOCIAL_CONNECT_FACEBOOK_ID = 'inchoo_socialconnect_fid';
+    CONST SOCIAL_CONNECT_GOOGLE_ID   = 'inchoo_socialconnect_gid';
+    CONST SOCIAL_CONNECT_VK_ID  = 'inchoo_socialconnect_vid';
 
-    public function disconnect(Mage_Customer_Model_Customer $customer) {
+    public function disconnect(Mage_Customer_Model_Customer $customer)
+    {
+        $client = Mage::getSingleton('inchoo_socialconnect/twitter_client');
+
         Mage::getSingleton('customer/session')
                 ->unsInchooSocialconnectTwitterUserinfo();
         
@@ -53,8 +59,53 @@ class Inchoo_SocialConnect_Helper_Twitter extends Mage_Core_Helper_Abstract
         }        
         
         $customer->setInchooSocialconnectTid(null)
-        ->setInchooSocialconnectTtoken(null)
-        ->save();   
+                 ->setInchooSocialconnectTtoken(null)
+                 ->save();
+
+        if ($client->canDeleteAccount())
+        {
+            $collection = Mage::getModel('customer/customer')->getCollection()
+                ->addAttributeToSelect('*')
+                ->addAttributeToFilter('inchoo_socialconnect_vemail', 1)
+                ->addAttributeToFilter('entity_id', $customer->getId())
+                ->setPageSize(1);
+
+            if ($collection->count())
+            {
+                $customerTemp = $collection->getFirstItem();
+
+                $attributes = $customerTemp->getAttributes();
+
+                $hasAnotherSessions = false;
+
+                foreach($attributes as $attribute)
+                {
+                    if (in_array($attribute->getAttributeCode(), array(
+                        self::SOCIAL_CONNECT_FACEBOOK_ID,
+                        self::SOCIAL_CONNECT_GOOGLE_ID,
+                        self::SOCIAL_CONNECT_VK_ID
+                    )) && $customerTemp->getData($attribute->getAttributeCode()))
+                    {
+                        $hasAnotherSessions = true;
+                        break;
+                    }
+                }
+
+                if (!$hasAnotherSessions)
+                {
+                    Mage::register('isSecureArea', true, true);
+                    Mage::getModel('customer/customer')->load($customer->getId())->delete();
+                    Mage::unregister('isSecureArea');
+
+                    Mage::getSingleton('customer/session')->logout()->setBeforeAuthUrl(Mage::getUrl());
+
+                    //Mage::app()->getResponse()->setRedirect();
+                    return Mage::getUrl('customer/account/');
+                }
+            }
+        }
+
+        return NULL;
     }
     
     public function connectByTwitterId(

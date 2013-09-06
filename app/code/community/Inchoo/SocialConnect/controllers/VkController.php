@@ -172,7 +172,7 @@ class Inchoo_SocialConnect_VkController extends Mage_Core_Controller_Front_Actio
 
             $email = $client->getEmail($userInfo->screen_name);
 
-            /*$customersByEmail = Mage::helper('inchoo_socialconnect/vk')->getCustomersByEmail($email);
+            $customersByEmail = Mage::helper('inchoo_socialconnect/vk')->getCustomersByEmail($email);
 
             if($customersByEmail->count()) {                
                 // Email account already exists - attach, login
@@ -189,7 +189,7 @@ class Inchoo_SocialConnect_VkController extends Mage_Core_Controller_Front_Actio
                 );
 
                 return;
-            }*/
+            }
 
             // New connection - create, attach, login
             if(empty($userInfo->first_name)) {

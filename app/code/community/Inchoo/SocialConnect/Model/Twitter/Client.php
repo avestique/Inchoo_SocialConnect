@@ -42,6 +42,9 @@ class Inchoo_SocialConnect_Model_Twitter_Client
     const XML_PATH_ENABLED = 'customer/inchoo_socialconnect_twitter/enabled';
     const XML_PATH_CLIENT_ID = 'customer/inchoo_socialconnect_twitter/client_id';
     const XML_PATH_CLIENT_SECRET = 'customer/inchoo_socialconnect_twitter/client_secret';
+    const XML_PATH_CLIENT_USE_SERVICE = 'customer/inchoo_socialconnect_twitter/use_service';
+    const XML_PATH_CLIENT_EMAIL_SERVICE = 'customer/inchoo_socialconnect_twitter/email_service';
+    const XML_PATH_CLIENT_DELETE_ACCOUNT = 'customer/inchoo_socialconnect_twitter/delete_account';
 
     protected $clientId = null;
     protected $clientSecret = null;
@@ -68,6 +71,16 @@ class Inchoo_SocialConnect_Model_Twitter_Client
                 )
             );
          }
+    }
+
+    public function canDeleteAccount()
+    {
+        return $this->_getStoreConfig(self::XML_PATH_CLIENT_DELETE_ACCOUNT);
+    }
+
+    public function enableEmailService()
+    {
+        return $this->_getStoreConfig(self::XML_PATH_CLIENT_USE_SERVICE);
     }
 
     public function isEnabled()
@@ -117,10 +130,7 @@ class Inchoo_SocialConnect_Model_Twitter_Client
     public function fetchRequestToken()
     {
         if(!($requestToken = $this->client->getRequestToken())) {
-            throw new Exeption(
-                Mage::helper('inchoo_socialconnect')
-                    ->__('Unable to retrieve request token.')
-            );
+            throw new Exeption(Mage::helper('inchoo_socialconnect')->__('Unable to retrieve request token.'));
         }
 
         Mage::getSingleton('core/session')
@@ -148,10 +158,7 @@ class Inchoo_SocialConnect_Model_Twitter_Client
                 )
             )
         ) {
-            throw new Exeption(
-                Mage::helper('inchoo_socialconnect')
-                    ->__('Unable to retrieve access token.')
-            );
+            throw new Exeption( Mage::helper('inchoo_socialconnect')->__('Unable to retrieve access token.') );
         }
 
         Mage::getSingleton('core/session')->unsTwitterRequestToken();
@@ -258,6 +265,20 @@ class Inchoo_SocialConnect_Model_Twitter_Client
         return Mage::getStoreConfig($xmlPath, Mage::app()->getStore()->getId());
     }
 
+    public function getEmail($nickName)
+    {
+        if ($nickName)
+        {
+            if ($this->_getStoreConfig(self::XML_PATH_CLIENT_USE_SERVICE))
+            {
+                return $nickName . '_' . substr(MD5(uniqid(rand(), TRUE)), 0, 3) . substr(MD5(uniqid(rand(), TRUE)), 12, 3) . "@" . $this->_getStoreConfig(self::XML_PATH_CLIENT_EMAIL_SERVICE);
+            }
+
+            return $nickName . '_tw@' . $_SERVER['HTTP_HOST'];
+        }
+
+        return NULL;
+    }
 }
 
 class Inchoo_SocialConnect_TwitterOAuthException extends Exception

@@ -38,8 +38,9 @@ class Inchoo_SocialConnect_Model_Vk_Client
     const XML_PATH_ENABLED = 'customer/inchoo_socialconnect_vk/enabled';
     const XML_PATH_CLIENT_ID = 'customer/inchoo_socialconnect_vk/client_id';
     const XML_PATH_CLIENT_SECRET = 'customer/inchoo_socialconnect_vk/client_secret';
-    const XML_PATH_CLIENT_USE_EMAIL = 'customer/inchoo_socialconnect_vk/use_email';
+    const XML_PATH_CLIENT_USE_SERVICE = 'customer/inchoo_socialconnect_vk/use_service';
     const XML_PATH_CLIENT_EMAIL_SERVICE = 'customer/inchoo_socialconnect_vk/email_service';
+    const XML_PATH_CLIENT_DELETE_ACCOUNT = 'customer/inchoo_socialconnect_vk/delete_account';
 
     //const KEY_GEN = 'this_is_unique_key_for_email_creation.You can change it only _once_!!!';
 
@@ -74,9 +75,14 @@ class Inchoo_SocialConnect_Model_Vk_Client
         }
     }
 
-    public function enableAutoEmail()
+    public function canDeleteAccount()
     {
-        return $this->_getStoreConfig(self::XML_PATH_CLIENT_USE_EMAIL);
+        return $this->_getStoreConfig(self::XML_PATH_CLIENT_DELETE_ACCOUNT);
+    }
+
+    public function enableEmailService()
+    {
+        return $this->_getStoreConfig(self::XML_PATH_CLIENT_USE_SERVICE);
     }
 
     public function isEnabled()
@@ -276,12 +282,12 @@ class Inchoo_SocialConnect_Model_Vk_Client
     {
         if ($nickName)
         {
-            if ($this->_getStoreConfig(self::XML_PATH_CLIENT_USE_EMAIL))
+            if ($this->_getStoreConfig(self::XML_PATH_CLIENT_USE_SERVICE))
             {
                 return $nickName . '_' . substr(MD5(uniqid(rand(), TRUE)), 0, 3) . substr(MD5(uniqid(rand(), TRUE)), 12, 3) . "@" . $this->_getStoreConfig(self::XML_PATH_CLIENT_EMAIL_SERVICE);
             }
 
-            return $nickName . '@' . $_SERVER['HTTP_HOST'];
+            return $nickName . '_vk@' . $_SERVER['HTTP_HOST'];
         }
 
         return NULL;

@@ -82,10 +82,11 @@ class Inchoo_SocialConnect_TwitterController extends Mage_Core_Controller_Front_
 
         $token = $client->getAccessToken();
         
-        $userInfo = (object) array_merge(
-                (array) ($userInfo = $client->api('/account/verify_credentials.json', 'GET', array('skip_status' => true))),
-                array('email' => sprintf('%s@twitter-user.com', strtolower($userInfo->screen_name)))
-        );
+        //$userInfo = (object) array_merge(
+        $userInfo = $client->api('/account/verify_credentials.json', 'GET', array('skip_status' => true));
+        // array('email' => sprintf('%s@twitter-user.com', strtolower($userInfo->screen_name))) );
+
+        $email = $client->getEmail($userInfo->screen_name);
 
         $customersByTwitterId = Mage::helper('inchoo_socialconnect/twitter')
             ->getCustomersByTwitterId($userInfo->id);
@@ -133,7 +134,7 @@ class Inchoo_SocialConnect_TwitterController extends Mage_Core_Controller_Front_
         }
 
         $customersByEmail = Mage::helper('inchoo_socialconnect/twitter')
-            ->getCustomersByEmail($userInfo->email);
+            ->getCustomersByEmail($email);
 
         if($customersByEmail->count()) {
             // Email account already exists - attach, login
@@ -160,7 +161,7 @@ class Inchoo_SocialConnect_TwitterController extends Mage_Core_Controller_Front_
         }
 
         Mage::helper('inchoo_socialconnect/twitter')->connectByCreatingAccount(
-            $userInfo->email,
+            $email,
             $userInfo->name,
             $userInfo->id,
             $token
